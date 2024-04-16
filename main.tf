@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "us-east-2"
+  region = "us-east-1"
 }
 
 data "aws_availability_zones" "available" {}
@@ -30,10 +30,11 @@ resource "aws_security_group" "rds" {
   vpc_id = module.vpc.vpc_id
 
   ingress {
-    from_port   = 5432
-    to_port     = 5432
-    protocol    = "tcp"
-    cidr_blocks = ["192.80.0.0/16"]
+    from_port = 5432
+    to_port   = 5432
+    protocol  = "tcp"
+    #cidr_blocks = ["192.80.0.0/16"] ## VPN 71.183.198.133
+    cidr_blocks = ["71.183.198.133/32"]
   }
 
   egress {
@@ -50,7 +51,7 @@ resource "aws_security_group" "rds" {
 
 resource "aws_db_parameter_group" "education" {
   name   = "education"
-  family = "postgres14"
+  family = "postgres15"
 
   parameter {
     name  = "log_connections"
@@ -69,7 +70,7 @@ resource "aws_db_instance" "education" {
   instance_class         = "db.t3.micro"
   allocated_storage      = 5
   engine                 = "postgres"
-  engine_version         = "14.1"
+  engine_version         = "15.2"
   username               = var.db_username
   password               = var.db_password
   db_subnet_group_name   = aws_db_subnet_group.education.name
